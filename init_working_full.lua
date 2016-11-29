@@ -1,4 +1,4 @@
-pin = 5
+pin = 4
 thinkspeak_ip = "69.172.201.153"
 --192.168.1.26"
 conf_ssid = nil
@@ -68,9 +68,11 @@ end
 function preStart(ssid, password)
     
 end
+
 --sendData();
 -- send data every X ms to thing speak
 print("starting my init file")
+wifi.sleeptype(wifi.LIGHT_SLEEP)
 if file.open("myconf","r") then
     conf_ssid=file.readline()
     conf_password=file.readline()
@@ -83,13 +85,13 @@ if conf_ssid == nil then
     wifi.startsmart(0,
         function(ssid,password) 
             print(string.format("Success. SSID:%s ; PASSWORD:%s start the dht func", ssid, password))
-            ---mytimer = tmr.alarm(2, 30000, 1, function() postThingSpeak(0) end )
-            postThingSpeak(0)
+            mytimer = tmr.alarm(2, 30000, 1, function() postThingSpeak(0) end )
+            ---postThingSpeak(0)
         end
     )
 else
-    print("we are already connected")
+    print("we are already connected ssid-"..ssid.." password-"..password)
     ---print(string.format("SSID:%s ; PASSWORD:%s start the dht func", ssid, password))
-    --- mytimer = tmr.alarm(2, 30000, 1, function() postThingSpeak(0) end )
-    postThingSpeak(0)
+    mytimer = tmr.alarm(2, 30000, 1, function() postThingSpeak(0) end )
+    --- postThingSpeak(0)
 end
