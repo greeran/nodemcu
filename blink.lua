@@ -1,6 +1,7 @@
 lighton=0
-pin=4
+pin=3
 gpio.mode(pin,gpio.OUTPUT)
+print("pin "..pin.." setup") 
 tmr.alarm(1,2000,1,function()
     if lighton==0 then
         lighton=1

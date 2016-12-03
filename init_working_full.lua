@@ -1,16 +1,18 @@
 pin = 4
 thinkspeak_ip = "69.172.201.153"
 --192.168.1.26"
-conf_ssid = nil
-conf_password = nil
+conf_ssid = "HOTBOX-AB72" ---nil
+conf_password = "popohead103" --nil
 
 function getTemp()
+    print("getting temp on pin "..pin);
     status,temp,humi,temp_decimial,humi_decimial = dht.read11(pin)
     if( status == dht.OK ) then
       -- Integer firmware using this example
       print(
         string.format(
-          "in function DHT Temperature:%d.%03d;Humidity:%d.%03d\r\n",
+          "in function DHT (pin %d) Temperature:%d.%03d;Humidity:%d.%03d\r\n",
+          pin,
           math.floor(temp),
           temp_decimial,
           math.floor(humi),
@@ -28,7 +30,7 @@ end
 
 function postThingSpeak(level)
     getTemp();
-   
+    
     connout = nil
     connout = net.createConnection(net.TCP, 0)
  
@@ -57,7 +59,7 @@ function postThingSpeak(level)
  
     connout:on("disconnection", function(connout, payloadout)
         connout:close();
-        node.dsleep(5 * 1000000)
+        ---node.dsleep(5 * 1000000)
         ---collectgarbage();
     end)
  
@@ -65,33 +67,31 @@ function postThingSpeak(level)
 
 end
 
-function preStart(ssid, password)
-    
-end
 
 --sendData();
 -- send data every X ms to thing speak
 print("starting my init file")
-wifi.sleeptype(wifi.LIGHT_SLEEP)
-if file.open("myconf","r") then
-    conf_ssid=file.readline()
-    conf_password=file.readline()
-    file.close()
-end    
+wifi.sleeptype(wifi.LIGHT_SLEEP) 
 
 if conf_ssid == nil then
-    print("waiting for ssid and password")
+    print("waiting for ssid and password 4")
     wifi.setmode(wifi.STATION)
     wifi.startsmart(0,
         function(ssid,password) 
             print(string.format("Success. SSID:%s ; PASSWORD:%s start the dht func", ssid, password))
-            mytimer = tmr.alarm(2, 30000, 1, function() postThingSpeak(0) end )
+            mytimer = tmr.alarm(2, 6000, 1, function() postThingSpeak(0) end )
             ---postThingSpeak(0)
         end
     )
 else
-    print("we are already connected ssid-"..ssid.." password-"..password)
-    ---print(string.format("SSID:%s ; PASSWORD:%s start the dht func", ssid, password))
-    mytimer = tmr.alarm(2, 30000, 1, function() postThingSpeak(0) end )
-    --- postThingSpeak(0)
+    wifi.sta.config(conf_ssid,conf_password)
+    print("we are already connected ssid-"..conf_ssid.." password-"..conf_password)
+    
+    --- ran test
+    dofile("WebServer.lua")
+    
+    ---  uncomment--- postThingSpeak(0)
+     ---- ---- tmr.alarm(1, 6000, 1, function() postThingSpeak(0) end)
+    -- tmr.alarm(1, 6000, 1, function() getTemp() end)
+    --- end ran test 
 end
