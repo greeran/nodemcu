@@ -20,7 +20,15 @@ srv:listen(80,function(conn)
                 print("["..k.."]="..v.." ")
             end     
         end
-        
+
+        if(_GET.getTemp == "Temp")then
+              dofile("getDht11.lua");
+        elseif(_GET.sendThings == "Thing")then
+              print("Got Thing");
+        ---elseif(_GET.startWork == "startWrk")then
+            ---print("min temp="..parse_min_temp.." max temp="..parse_max_temp);
+        ---    print("test")
+        end
         
         print("Setting the http");
         ---buf = buf.."<h1> Thermometer Setting</h1>";
@@ -38,14 +46,7 @@ srv:listen(80,function(conn)
 
 
         
-        if(_GET.getTemp == "Temp")then
-              dofile("getDht11.lua");
-        elseif(_GET.sendThings == "Thing")then
-              print("Got Thing");
-        ---elseif(_GET.startWork == "startWrk")then
-            ---print("min temp="..parse_min_temp.." max temp="..parse_max_temp);
-        ---    print("test")
-        end
+      
         client:send(buf);
         client:close();
         collectgarbage();
