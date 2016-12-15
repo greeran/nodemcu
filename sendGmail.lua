@@ -18,12 +18,12 @@
  ------- @author Miguel  
  --no longer required because it is part of the crypto module: require("base64")  
  -- The email and password from the account you want to send emails from  
- local MY_EMAIL = "greeranjunk@gmail.com"  
- local EMAIL_PASSWORD = "QAZ!plm0"  
+ local MY_EMAIL = "postmaster@sandbox5415a5ae2f9444c68831550eb196ce8b.mailgun.org"  
+ local EMAIL_PASSWORD = "QAZWSX12"  
  -- The SMTP server and port of your email provider.  
  -- If you don't know it google [my email provider] SMTP settings  
- local SMTP_SERVER = "smtp.gmail.com"  
- local SMTP_PORT = "465"  
+ local SMTP_SERVER = "smtp.mailgun.org"  
+ local SMTP_PORT = "465"--"587"  
  -- The account you want to send email to  
  local mail_to = "greeran@gmail.com"  
  -- These are global variables. Don't change their values  
@@ -99,6 +99,7 @@
     smtp_socket = net.createConnection(net.TCP,1)  
     smtp_socket:on("connection",connected)  
     smtp_socket:on("receive",display)  
+    print("connecting to "..SMTP_SERVER..":"..SMTP_PORT.." ")
     smtp_socket:connect(SMTP_PORT,SMTP_SERVER)  
  end  
  -- Send an email  
