@@ -88,8 +88,8 @@ else
     print("we are already connected ssid-"..conf_ssid.." password-"..conf_password)
     
     --- ran test
-    dofile("sendGmail.lua")
-    ---dofile("WebServer.lua")
+    ---dofile("sendGmail.lua")
+    dofile("WebServer.lua")
     
     ---  uncomment--- postThingSpeak(0)
      ---- ---- tmr.alarm(1, 6000, 1, function() postThingSpeak(0) end)

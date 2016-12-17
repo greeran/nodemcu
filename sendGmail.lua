@@ -18,6 +18,10 @@
  ------- @author Miguel  
  --no longer required because it is part of the crypto module: require("base64")  
  -- The email and password from the account you want to send emails from  
+ -- 
+ 
+ local sendGmailClass={}
+ 
  local MY_EMAIL = "postmaster@sandbox5415a5ae2f9444c68831550eb196ce8b.mailgun.org"  
  local EMAIL_PASSWORD = "QAZWSX12"  
  -- The SMTP server and port of your email provider.  
@@ -25,7 +29,7 @@
  local SMTP_SERVER = "smtp.mailgun.org"  
  local SMTP_PORT = "465"--"587"  
  -- The account you want to send email to  
- local mail_to = "greeran@gmail.com"  
+ local mail_to_addr = "greeranjunk@gmail.com"  
  -- These are global variables. Don't change their values  
  -- they will be changed in the functions below  
  local email_subject = "testing"  
@@ -59,7 +63,7 @@
          smtp_socket:send("MAIL FROM:<" .. MY_EMAIL .. ">\r\n")  
        elseif(count==5) then  
          count = count+1  
-         smtp_socket:send("RCPT TO:<" .. mail_to ..">\r\n")  
+         smtp_socket:send("RCPT TO:<" .. mail_to_addr ..">\r\n")  
        elseif(count==6) then  
          count = count+1  
          smtp_socket:send("DATA\r\n")  
@@ -67,7 +71,7 @@
          count = count+1  
          local message = string.gsub(  
          "From: \"".. MY_EMAIL .."\"<"..MY_EMAIL..">\r\n" ..  
-         "To: \"".. mail_to .. "\"<".. mail_to..">\r\n"..  
+         "To: \"".. mail_to_addr .. "\"<".. mail_to_addr..">\r\n"..  
          "Subject: ".. email_subject .. "\r\n\r\n" ..  
          email_body,"\r\n.\r\n","")  
          smtp_socket:send(message.."\r\n.\r\n")  
@@ -75,6 +79,7 @@
          count = count+1  
           tmr.stop(0)  
           smtp_socket:send("QUIT\r\n")  
+          NotificationFail=true
        else  
          smtp_socket:close()  
        end  
@@ -101,7 +106,17 @@
     smtp_socket:on("receive",display)  
     print("connecting to "..SMTP_SERVER..":"..SMTP_PORT.." ")
     smtp_socket:connect(SMTP_PORT,SMTP_SERVER)  
- end  
+ end
+ 
+ function sendGmailClass.sendGmailFunc(mail_to)
  -- Send an email  
- print ("Sending started...")  
- send_email("ESP8266-GMailSender","Hi there!")  
+  if(mail_to == nil)then
+    print("no mail to notifiy")
+  else
+    print ("Sending started..."..mail_to)  
+    mail_to_addr=mail_to
+    send_email("ESP8266-GMailSender","Hi there!")  
+  end
+ end
+ 
+return sendGmailClass;

@@ -1,6 +1,8 @@
 ---local getDht11=require("getDht11.lua")
 dofile("getDht11.lua")
 
+local sendGmailObj =require("sendGmail")
+
 if srv~=nil then
   srv:close()
 end
@@ -23,12 +25,17 @@ srv:listen(80,function(conn)
 
         if(_GET.getTemp == "Temp")then
               dofile("getDht11.lua");
-        elseif(_GET.sendThings == "Thing")then
-              print("Got Thing");
-        ---elseif(_GET.startWork == "startWrk")then
-            ---print("min temp="..parse_min_temp.." max temp="..parse_max_temp);
-        ---    print("test")
+        ---elseif(_GET.sendThings == "Thing")then
+        ---      print("Got Thing");
+        elseif(_GET.action == "Test")then
+          print("Testing mail 2")
+          sendGmailObj.sendGmailFunc(_GET.notification)
+          ---dofile("sendGmail.lua")
+        elseif(_GET.action == "Start")then
+          print("starting with temp min/max".._GET.mintemp.."/".._GET.maxtemp)
         end
+        
+        mail_to = _GET.notification
         
         print("Setting the http");
         ---buf = buf.."<h1> Thermometer Setting</h1>";
@@ -37,12 +44,20 @@ srv:listen(80,function(conn)
         buf= buf.."<h1> Thermometer Setting</h1>";
         buf= buf.."<h2>Temprature "..tempr.." Humidity "..humi.."</h2><p>";
         buf= buf.."<p>Get Tempruture and Humidity <a href=\"?getTemp=Temp\"><button>Press</button></a>&nbsp;</p>";
-        buf= buf.."<p>Send To Thingspeak <a href=\"?sendThings=Thing\"><button>Press</button></a>&nbsp;</p>";
+        ---buf= buf.."<p>Send To Thingspeak <a href=\"?sendThings=Thing\"><button>Press</button></a>&nbsp;</p>";
         buf= buf.."<form><p>Min Temprature <input type=\"text\" name=\"mintemp\" value=\"30\">&nbsp;</p>";
         buf= buf.."<p>Max Temprature <input type=\"text\" name=\"maxtemp\" value=\"40\">&nbsp;</p>";
         buf= buf.."<p>Min Humidity <input type=\"text\" name=\"minhumd\" value=\"30\">&nbsp;</p>";
         buf= buf.."<p>Max Humitidy <input type=\"text\" name=\"maxhumd\" value=\"40\">&nbsp;</p>";
-        buf= buf.."</p><p>Start Working \"<button>Start</button></a></form>&nbsp;</p>";
+        buf= buf.."<p>notification Mail <input name=\"notification\" type=\"text\" /> <input type=\"submit\" name=\"action\" value=\"Test Mail\""
+        if(_GET.action == "Test")then
+          if(false == NotificationFail)then
+            buf= buf.."<font color=red> Failed Mail Test <\font>"
+          else
+            buf= buf.."<font color=green> Success Mail Test <\font>"
+          end
+        end
+        buf= buf.."</p><p><input type=\"submit\" name=\"action\" value=\"Start Working\" </p></a></form>&nbsp;</p>";
 
 
         
