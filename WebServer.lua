@@ -2,6 +2,7 @@
 dofile("getDht11.lua")
 
 local sendGmailObj =require("sendGmail")
+local thinkLoop = require("thinkspeak-loop")
 
 if srv~=nil then
   srv:close()
@@ -14,6 +15,7 @@ humiMax=35;
 sndToMail="enter mail here"
 
 srv=net.createServer(net.TCP)
+
 srv:listen(80,function(conn)
     conn:on("receive", function(client,request)
         local buf = "";
@@ -44,7 +46,7 @@ srv:listen(80,function(conn)
           tempMin=_GET.mintemp;
           humiMax=_GET.maxhumd;
           humiMin=_GET.minhumd;
-          sendGmailObj.sendGmailFunc(_GET.notification)
+          sendGmailObj.sendGmailFunc(_GET.notification,tempr,humi)
           ---dofile("sendGmail.lua")
         elseif(_GET.action == "Start")then
           tempMax=_GET.maxtemp;
@@ -52,6 +54,8 @@ srv:listen(80,function(conn)
           humiMax=_GET.maxhumd;
           humiMin=_GET.minhumd;
           sndToMail=_GET.notification;
+          thinkLoop.startLoop(tempMax,tempMin,humiMax,humiMin,sndToMail)
+          
         end
         
         mail_to = _GET.notification

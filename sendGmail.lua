@@ -108,14 +108,27 @@
     smtp_socket:connect(SMTP_PORT,SMTP_SERVER)  
  end
  
- function sendGmailClass.sendGmailFunc(mail_to)
+ function sendGmailClass.sendGmailFunc(mail_to,temp,humid)
  -- Send an email  
   if(mail_to == nil)then
     print("no mail to notifiy")
   else
     print ("Sending started..."..mail_to)  
     mail_to_addr=mail_to
-    send_email("ESP8266-GMailSender","Hi there!")  
+    send_email("Tempreture or Humidity Ineterval",
+    "Everything is OK\nTempratur ["..temp.."]\nHumitity ["..humid.."]")
+  end
+ end
+ 
+ function sendGmailClass.sendBadTempFunc(mail_to,temp,humid)
+ -- Send an email  
+  if(mail_to == nil)then
+    print("no mail to notifiy")
+  else
+    print ("Sending started..."..mail_to)  
+    mail_to_addr=mail_to
+    send_email("Bad Tempreture or Humidity",
+    "There is a problem with the Temprature or Humidity\nTempratur ["..temp.."]\nHumitity ["..humid.."]")  
   end
  end
  
