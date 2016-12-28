@@ -4,6 +4,8 @@ thinkspeak_ip = "69.172.201.153"
 conf_ssid = "HOTBOX-AB72" ---nil
 conf_password = "popohead103" --nil
 
+dofile("getDht11.lua")
+
 function getTemp()
     print("getting temp on pin "..pin);
     status,temp,humi,temp_decimial,humi_decimial = dht.read11(pin)
@@ -71,7 +73,7 @@ end
 --sendData();
 -- send data every X ms to thing speak
 print("starting my init file")
-wifi.sleeptype(wifi.LIGHT_SLEEP) 
+---wifi.sleeptype(wifi.LIGHT_SLEEP) 
 
 if conf_ssid == nil then
     print("waiting for ssid and password 4")

@@ -4,7 +4,7 @@ local pin = 4
 local thinkspeak_ip = "69.172.201.153"
 local maxtmp,mintmp,maxhmd,minhmd,toEmail
 local counter=0
-local MAX_INTERVALS=2
+local MAX_INTERVALS=4
 local tempAvg=0
 local humiAvg=0
 
@@ -34,7 +34,7 @@ function getTemp()
     end
 end
 
-function postThingSpeak(level)
+function postThingSpeak(temprature, humidity)
    
     connout = nil
     connout = net.createConnection(net.TCP, 0)
@@ -46,20 +46,18 @@ function postThingSpeak(level)
     end)
  
     connout:on("connection", function(connout, payloadout)
-        if(temp < 0) then
-            print("Failed to get temp and Humidity\n")
-        else 
+        
             print ("Posting...");
      
             ---local volt = node.readvdd33();      
      
-            connout:send("GET /update?api_key=61TUR14P6J0LX5OU&field1="..temp.."&field2="..humi.." HTTP/1.1\r\n"
+            connout:send("GET /update?api_key=61TUR14P6J0LX5OU&field1="..temprature.."&field2="..humidity.." HTTP/1.1\r\n"
             .. "Host: api.thingspeak.com\r\n"
             .. "Connection: close\r\n"
             .. "Accept: */*\r\n"
             .. "User-Agent: Mozilla/4.0 (compatible; esp8266 Lua; Windows NT 5.1)\r\n"
             .. "\r\n")
-        end
+        
     end)
  
     connout:on("disconnection", function(connout, payloadout)
@@ -74,14 +72,17 @@ end
 
 function checkTemp()
   getTemp()
-  if((temp < mintmp) or (temp > maxtmp) or (humi < minhmd) or (humi > maxhmd)) then
+  if((temp < tonumber(mintmp)) or (temp > tonumber(maxtmp)) or (humi < tonumber(minhmd)) or (humi > tonumber(maxhmd))) then
+    print("send bad funk"..temp.." "..humi.." "..toEmail)
     sendGmailObj.sendBadTempFunc(temp,humi,toEmail)
   else
-    postThingSpeak(0)
+    print("do postthing interval "..counter)
+    postThingSpeak(temp,humi)
     counter = counter +1
     tempAvg=tempAvg+temp
     humiAvg=humiAvg+humi
     if(counter == MAX_INTERVALS) then
+      print("interval mail "..(tempAvg/MAX_INTERVALS).." "..(humiAvg/MAX_INTERVALS).." "..toEmail)
       sendGmailObj.sendGmailFunc(tempAvg/MAX_INTERVALS,humiAvg/MAX_INTERVALS,toEmail)
       counter = 0
     end
@@ -95,5 +96,7 @@ function thinkspeakLoop.startLoop(maxtemp,mintemp,maxhumidity,minhumitidy,to_ema
   minhmd=minhumitidy;
   toEmail=to_email;
   counter=0
-  mytimer = tmr.alarm(2, 6000, 1, function() checkTemp() end )
+  mytimer = tmr.alarm(2, 30000, 1, function() checkTemp() end )
 end
+
+return thinkspeakLoop

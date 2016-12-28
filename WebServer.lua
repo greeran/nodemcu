@@ -54,6 +54,7 @@ srv:listen(80,function(conn)
           humiMax=_GET.maxhumd;
           humiMin=_GET.minhumd;
           sndToMail=_GET.notification;
+          print("test"..tempMax.." test "..tempMin.." test "..humiMax.." test "..humiMin.." test "..sndToMail.." ")
           thinkLoop.startLoop(tempMax,tempMin,humiMax,humiMin,sndToMail)
           
         end
