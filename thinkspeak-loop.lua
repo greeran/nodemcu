@@ -4,9 +4,10 @@ local pin = 4
 local thinkspeak_ip = "69.172.201.153"
 local maxtmp,mintmp,maxhmd,minhmd,toEmail
 local counter=0
-local MAX_INTERVALS=4
+local MAX_INTERVALS=2
 local tempAvg=0
 local humiAvg=0
+local loopTimer=tmr.create()
 
 local sendGmailObj =require("sendGmail")
 
@@ -87,6 +88,8 @@ function checkTemp()
       counter = 0
     end
   end
+  loopTimer:start()
+  
 end
 
 function thinkspeakLoop.startLoop(maxtemp,mintemp,maxhumidity,minhumitidy,to_email)
@@ -96,7 +99,13 @@ function thinkspeakLoop.startLoop(maxtemp,mintemp,maxhumidity,minhumitidy,to_ema
   minhmd=minhumitidy;
   toEmail=to_email;
   counter=0
-  mytimer = tmr.alarm(2, 30000, 1, function() checkTemp() end )
+  loopTimer:register(5000, tmr.ALARM_SEMI, checkTemp)
+  checkTemp()
+  ---mytimer = tmr.alarm(2, 6000, 1, function() checkTemp() end )
+end
+
+function thinkspeakLoop.stopLoop()
+  loopTimer:stop()
 end
 
 return thinkspeakLoop
