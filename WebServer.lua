@@ -1,5 +1,4 @@
----local getDht11=require("getDht11.lua")
-dofile("getDht11.lua")
+local getDht11Obj=require("getDht11")
 
 local sendGmailObj =require("sendGmail")
 local thinkLoop = require("thinkspeak-loop")
@@ -8,13 +7,17 @@ if srv~=nil then
   srv:close()
 end
 
-tempMin=25;
+tempMin=15;
 tempMax=35;
 humiMin=25;
-humiMax=35;
-sndToMail="enter mail here"
+humiMax=50;
+sndToMail="greeranjunk@gmail.com"
 
 srv=net.createServer(net.TCP)
+
+local dhtstat,dhttemp,dhthumi
+
+dhtstat,dhttemp,dhthumi=getDht11Obj.getTemp();
 
 srv:listen(80,function(conn)
     conn:on("receive", function(client,request)
@@ -36,9 +39,7 @@ srv:listen(80,function(conn)
         end
 
         if(_GET.getTemp == "Temp")then
-              dofile("getDht11.lua");
-        ---elseif(_GET.sendThings == "Thing")then
-        ---      print("Got Thing");
+              dhtstat,dhttemp,dhthumi=getDht11Obj.getTemp();              
         elseif(_GET.action == "Test")then
           print("Testing mail 2")
           sndToMail=_GET.notification;
@@ -46,7 +47,8 @@ srv:listen(80,function(conn)
           tempMin=_GET.mintemp;
           humiMax=_GET.maxhumd;
           humiMin=_GET.minhumd;
-          sendGmailObj.sendGmailFunc(_GET.notification,tempr,humi)
+          sendGmailObj.setMailToAddr(_GET.notification)
+          sendGmailObj.sendGmailFunc(tempr,humi,_GET.notification)
           ---dofile("sendGmail.lua")
         elseif(_GET.action == "Start")then
           tempMax=_GET.maxtemp;
@@ -66,7 +68,7 @@ srv:listen(80,function(conn)
         ---buf = buf.."<p>Get Tempruture and Humidity<a href=\"?getTemp=Temp\"><button>Press</button></a>&nbsp";
         ---buf = buf.."<p>Send To Thingspeak<a href=\"?sendThings=Thing\"><button>Press</button></a>&nbsp";
         buf= buf.."<h1> Thermometer Setting</h1>";
-        buf= buf.."<h2>Temprature "..tempr.." Humidity "..humi.."</h2><p>";
+        buf= buf.."<h2>Temprature "..dhttemp.." Humidity "..dhthumi.."</h2><p>";
         buf= buf.."<p>Get Tempruture and Humidity <a href=\"?getTemp=Temp\"><button>Press</button></a>&nbsp;</p>";
         ---buf= buf.."<p>Send To Thingspeak <a href=\"?sendThings=Thing\"><button>Press</button></a>&nbsp;</p>";
         buf= buf.."<form><p>Min Temprature <input type=\"text\" name=\"mintemp\" value="..tempMin..">&nbsp;</p>";

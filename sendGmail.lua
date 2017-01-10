@@ -108,28 +108,36 @@
     smtp_socket:connect(SMTP_PORT,SMTP_SERVER)  
  end
  
- function sendGmailClass.sendGmailFunc(mail_to,temp,humid)
+ function sendGmailClass.sendGmailFunc(temp,humid,mailToAddr)
  -- Send an email  
-  if(mail_to == nil)then
+  print("test mail ="..mailToAddr);
+  print("temp="..temp);
+  print("humid="..humid); 
+  if(mailToAddr == nil)then
     print("no mail to notifiy")
   else
-    print ("Sending started..."..mail_to)  
-    mail_to_addr=mail_to
+    print ("Sending started..."..mailToAddr)
+    mail_to_addr=mailToAddr  
     send_email("Tempreture or Humidity Ineterval",
     "Everything is OK\nTempratur ["..temp.."]\nHumitity ["..humid.."]")
   end
  end
  
- function sendGmailClass.sendBadTempFunc(mail_to,temp,humid)
+ function sendGmailClass.sendBadTempFunc(temp,humid,mailToAddr)
  -- Send an email  
-  if(mail_to == nil)then
+  if(mailToAddr == nil)then
     print("no mail to notifiy")
   else
-    print ("Sending started..."..mail_to)  
-    mail_to_addr=mail_to
+    print ("Sending started..."..mailToAddr)  
+    mail_to_addr=mailToAddr
     send_email("Bad Tempreture or Humidity",
     "There is a problem with the Temprature or Humidity\nTempratur ["..temp.."]\nHumitity ["..humid.."]")  
   end
+ end
+ 
+ function sendGmailClass.setMailToAddr(mailAddr)
+  print("testing "..mailAddr)
+  mail_to_addr = mailAddr
  end
  
 return sendGmailClass;

@@ -1,39 +1,16 @@
 local thinkspeakLoop={}
 
-local pin = 4
+
 local thinkspeak_ip = "69.172.201.153"
 local maxtmp,mintmp,maxhmd,minhmd,toEmail
 local counter=0
-local MAX_INTERVALS=2
+local MAX_INTERVALS=6
 local tempAvg=0
 local humiAvg=0
 local loopTimer=tmr.create()
 
 local sendGmailObj =require("sendGmail")
-
-function getTemp()
-    print("getting temp on pin "..pin);
-    status,temp,humi,temp_decimial,humi_decimial = dht.read11(pin)
-    if( status == dht.OK ) then
-      -- Integer firmware using this example
-      print(
-        string.format(
-          "in function DHT (pin %d) Temperature:%d.%03d;Humidity:%d.%03d\r\n",
-          pin,
-          math.floor(temp),
-          temp_decimial,
-          math.floor(humi),
-          humi_decimial
-        )
-      )
-      -- Float firmware using this example
-      print("floating DHT Temperature:"..temp..";".."Humidity:"..humi)
-    elseif( status == dht.ERROR_CHECKSUM ) then
-      print( "DHT Checksum error." );
-    elseif( status == dht.ERROR_TIMEOUT ) then
-      print( "DHT Time out." );
-    end
-end
+local getDht11bj = require("getDht11")
 
 function postThingSpeak(temprature, humidity)
    
@@ -72,20 +49,26 @@ function postThingSpeak(temprature, humidity)
 end
 
 function checkTemp()
-  getTemp()
-  if((temp < tonumber(mintmp)) or (temp > tonumber(maxtmp)) or (humi < tonumber(minhmd)) or (humi > tonumber(maxhmd))) then
-    print("send bad funk"..temp.." "..humi.." "..toEmail)
-    sendGmailObj.sendBadTempFunc(temp,humi,toEmail)
+  local dhtstat,temp,humi=getDht11bj.getTemp();
+  if(dhtstat == -1) then
+    print("failed the dht get temp")
   else
-    print("do postthing interval "..counter)
-    postThingSpeak(temp,humi)
-    counter = counter +1
-    tempAvg=tempAvg+temp
-    humiAvg=humiAvg+humi
-    if(counter == MAX_INTERVALS) then
-      print("interval mail "..(tempAvg/MAX_INTERVALS).." "..(humiAvg/MAX_INTERVALS).." "..toEmail)
-      sendGmailObj.sendGmailFunc(tempAvg/MAX_INTERVALS,humiAvg/MAX_INTERVALS,toEmail)
-      counter = 0
+    if((temp < tonumber(mintmp)) or (temp > tonumber(maxtmp)) or (humi < tonumber(minhmd)) or (humi > tonumber(maxhmd))) then
+      print("send bad funk "..temp.." "..humi.." "..toEmail.." limits in one: "..mintmp.." "..maxtmp.." "..minhmd.." "..maxhmd);
+      sendGmailObj.sendBadTempFunc(temp,humi,toEmail)
+    else
+      print("do postthing interval "..counter)
+      postThingSpeak(temp,humi)
+      counter = counter +1
+      tempAvg=tempAvg+temp
+      humiAvg=humiAvg+humi
+      if(counter == MAX_INTERVALS) then
+        local tmpMail=toEmail;
+        print("interval mail "..(tempAvg/MAX_INTERVALS).." "..(humiAvg/MAX_INTERVALS).." tmpmail="..tmpMail)
+        ---sendGmailObj.testFunc(toEmail)
+        sendGmailObj.sendGmailFunc(math.floor(tempAvg/MAX_INTERVALS),math.floor(humiAvg/MAX_INTERVALS),tmpMail);
+        counter = 0
+      end
     end
   end
   loopTimer:start()
@@ -99,7 +82,7 @@ function thinkspeakLoop.startLoop(maxtemp,mintemp,maxhumidity,minhumitidy,to_ema
   minhmd=minhumitidy;
   toEmail=to_email;
   counter=0
-  loopTimer:register(5000, tmr.ALARM_SEMI, checkTemp)
+  loopTimer:register(600000, tmr.ALARM_SEMI, checkTemp)
   checkTemp()
   ---mytimer = tmr.alarm(2, 6000, 1, function() checkTemp() end )
 end
