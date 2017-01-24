@@ -2,23 +2,22 @@ local dht11obj =require("getDht11")
 
 thinkspeak_ip = "69.172.201.153"
 --192.168.1.26"
-conf_ssid = "HOTBOX-AB72" ---nil
-conf_password = "popohead103" --nil
+conf_ssid = nil ---"HOTBOX-AB72" ---nil
+conf_password = nil ---"popohead103" --nil
 
 dht11obj.getTemp();
 
 print("starting my init file")
----wifi.sleeptype(wifi.LIGHT_SLEEP) 
+wifi.sleeptype(wifi.LIGHT_SLEEP) 
 wifi.setmode(wifi.STATION)
 
 if conf_ssid == nil then
     print("waiting for ssid and password 4")
-    wifi.setmode(wifi.STATION)
+    ---wifi.setmode(wifi.STATION)
     wifi.startsmart(0,
         function(ssid,password) 
             print(string.format("Success. SSID:%s ; PASSWORD:%s start the dht func", ssid, password))
-            mytimer = tmr.alarm(2, 6000, 1, function() postThingSpeak(0) end )
-            ---postThingSpeak(0)
+            dofile("WebServer.lua")
         end
     )
 else

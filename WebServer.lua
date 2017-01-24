@@ -47,8 +47,7 @@ srv:listen(80,function(conn)
           tempMin=_GET.mintemp;
           humiMax=_GET.maxhumd;
           humiMin=_GET.minhumd;
-          sendGmailObj.setMailToAddr(_GET.notification)
-          sendGmailObj.sendGmailFunc(tempr,humi,_GET.notification)
+          sendGmailObj.sendGmailFunc(dhttemp,dhthumi,_GET.notification)
           ---dofile("sendGmail.lua")
         elseif(_GET.action == "Start")then
           tempMax=_GET.maxtemp;

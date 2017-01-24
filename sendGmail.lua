@@ -27,7 +27,7 @@
  -- The SMTP server and port of your email provider.  
  -- If you don't know it google [my email provider] SMTP settings  
  local SMTP_SERVER = "smtp.mailgun.org"  
- local SMTP_PORT = "465"--"587"  
+ local SMTP_PORT = "587" ---"465"--"587"  
  -- The account you want to send email to  
  local mail_to_addr = "greeranjunk@gmail.com"  
  -- These are global variables. Don't change their values  
@@ -101,7 +101,7 @@
     email_subject = subject  
     email_body = body  
     print ("Open Connection")  
-    smtp_socket = net.createConnection(net.TCP,1)  
+    smtp_socket = net.createConnection(net.TCP,0)  
     smtp_socket:on("connection",connected)  
     smtp_socket:on("receive",display)  
     print("connecting to "..SMTP_SERVER..":"..SMTP_PORT.." ")

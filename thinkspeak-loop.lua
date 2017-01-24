@@ -40,6 +40,15 @@ function postThingSpeak(temprature, humidity)
  
     connout:on("disconnection", function(connout, payloadout)
         connout:close();
+        
+        counter = counter +1
+        if(counter == MAX_INTERVALS) then
+          local tmpMail=toEmail;
+          print("interval mail "..(tempAvg/MAX_INTERVALS).." "..(humiAvg/MAX_INTERVALS).." tmpmail="..tmpMail)
+          ---sendGmailObj.testFunc(toEmail)
+          sendGmailObj.sendGmailFunc(math.floor(tempAvg/MAX_INTERVALS),math.floor(humiAvg/MAX_INTERVALS),tmpMail);
+          counter = 0
+        end
         ---node.dsleep(5 * 1000000)
         ---collectgarbage();
     end)
@@ -58,17 +67,9 @@ function checkTemp()
       sendGmailObj.sendBadTempFunc(temp,humi,toEmail)
     else
       print("do postthing interval "..counter)
-      postThingSpeak(temp,humi)
-      counter = counter +1
       tempAvg=tempAvg+temp
       humiAvg=humiAvg+humi
-      if(counter == MAX_INTERVALS) then
-        local tmpMail=toEmail;
-        print("interval mail "..(tempAvg/MAX_INTERVALS).." "..(humiAvg/MAX_INTERVALS).." tmpmail="..tmpMail)
-        ---sendGmailObj.testFunc(toEmail)
-        sendGmailObj.sendGmailFunc(math.floor(tempAvg/MAX_INTERVALS),math.floor(humiAvg/MAX_INTERVALS),tmpMail);
-        counter = 0
-      end
+      postThingSpeak(temp,humi)
     end
   end
   loopTimer:start()
