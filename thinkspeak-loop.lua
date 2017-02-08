@@ -4,7 +4,7 @@ local thinkspeakLoop={}
 local thinkspeak_ip = "69.172.201.153"
 local maxtmp,mintmp,maxhmd,minhmd,toEmail
 local counter=0
-local MAX_INTERVALS=6
+local MAX_INTERVALS=12
 local tempAvg=0
 local humiAvg=0
 local loopTimer=tmr.create()
@@ -42,7 +42,7 @@ function postThingSpeak(temprature, humidity)
         connout:close();
         
         counter = counter +1
-        if(counter == MAX_INTERVALS) then
+        if(counter == (MAX_INTERVALS-1)) then
           local tmpMail=toEmail;
           print("interval mail "..(tempAvg/MAX_INTERVALS).." "..(humiAvg/MAX_INTERVALS).." tmpmail="..tmpMail)
           ---sendGmailObj.testFunc(toEmail)
@@ -83,7 +83,7 @@ function thinkspeakLoop.startLoop(maxtemp,mintemp,maxhumidity,minhumitidy,to_ema
   minhmd=minhumitidy;
   toEmail=to_email;
   counter=0
-  loopTimer:register(600000, tmr.ALARM_SEMI, checkTemp)
+  loopTimer:register(3600000, tmr.ALARM_SEMI, checkTemp)
   checkTemp()
   ---mytimer = tmr.alarm(2, 6000, 1, function() checkTemp() end )
 end
