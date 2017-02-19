@@ -90,5 +90,10 @@ srv:listen(80,function(conn)
         client:send(buf);
         client:close();
         collectgarbage();
+        if(_GET.getTemp == "Temp")then
+          print("test deep sleep")
+          node.dsleep(10 * 1000000)
+          print("should not show")
+        end
     end)
 end)
