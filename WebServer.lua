@@ -27,13 +27,14 @@ function getDefaultFile()
 end
 
 function saveDefaultFile()
+  print("save default "..tempMin.." max "..tempMax)
   file.open(FileToExecute,"w+")
-  file.writeline(tempMin)
-  file.writeline(tempMax)
-  file.writeline(humiMin)
-  file.writeline(humiMax)
+  file.writeline("tempMin="..tempMin)
+  file.writeline("tempMax="..tempMax)
+  file.writeline("humiMin="..humiMin)
+  file.writeline("humiMax="..humiMax)
   
-  file.writeline(sndToMail)
+  file.writeline("sendToMail=\""..sndToMail.."\"")
   file.close()
   print("saving tempMax="..tempMax.." tempMin "..tempMin)
 end
@@ -89,7 +90,7 @@ function receiveFunc(client,request)
       tempMin=_GET.mintemp;
       humiMax=_GET.maxhumd;
       humiMin=_GET.minhumd;
-      sendGmailObj.sendGmailFunc(dhttemp,dhthumi,_GET.notification)
+      ---sendGmailObj.sendGmailFunc(dhttemp,dhthumi,_GET.notification)
       ---dofile("sendGmail.lua")
     elseif(_GET.action == "Start")then
       tempMax=_GET.maxtemp;
@@ -126,21 +127,26 @@ function receiveFunc(client,request)
     end
     buf= buf.."</p><p><input type=\"submit\" name=\"action\" value=\"Start Working\" </sp></a></form>&nbsp;</p>";
     client:send(buf);
-   
+    client:close()
+    collectgarbage()
+    if(_GET.action == "Test")then
+      saveDefaultFile()
+---      print("test deep sleep")
+---      node.dsleep(10 * 1000000)
+---      print("should not show")
+    end  
 end
 
 srv:listen(80,function(conn)
-    conn:on("receive", receiveFunc(client,request))
+    conn:on("receive", function(client,request)
+        ---print(request)
+        receiveFunc(client,request)
+      end)
     conn:on("sent", function(client) 
-        print("on disconnect")
-        client:close()
-        collectgarbage()
-        if(_GET.getTemp == "Temp")then
-          saveDefaultFile()
-          print("test deep sleep")
-          node.dsleep(10 * 1000000)
-          print("should not show")
-        end
+        print("on sent")
     end)
+---    conn:on("disconnect", function(client,errcode) 
+---        print("on disconnect")
+---    end)
 end)
 
