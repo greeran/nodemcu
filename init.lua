@@ -7,7 +7,7 @@ conf_password = nil --- "popohead103" --nil
 
 dht11obj.getTemp();
 
-FileToExecute="mywifi.lua"
+local FileToExecute="mywifi.lua"
 if file.exists(FileToExecute) then
   print("found file")
   dofile(FileToExecute)
